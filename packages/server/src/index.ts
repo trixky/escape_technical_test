@@ -1,16 +1,8 @@
 import { createServer } from 'node:http';
 import { createSchema, createYoga } from 'graphql-yoga';
 import { createPubSub } from 'graphql-yoga';
-import { createClient } from 'redis';
 import prismaClient from './database/client.js'
 import { emplacementCreateOrUpdate, emplacementGetAll } from './database/emplacement.js';
-
-// ------------------- redis
-const redisClient = createClient();
-redisClient.on('error', err => console.log('Redis Client Error', err));
-await redisClient.connect();
-
-
 
 export const pubsub = createPubSub<{
     emplacementUpdated: [{ x: number, y: number, color: string }];
