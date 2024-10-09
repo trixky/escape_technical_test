@@ -2,6 +2,7 @@
 	import { browser } from '$app/environment';
 	import { createOrUpdateEmplacement, subscribe } from '$lib/graphql';
 	import type Emplacement from '$lib/models/emplacement.js';
+	import { DEFAULT_COLOR, getCookieColor, setCookieColor } from '$lib/utils/color_cookie.js';
 	import { onMount } from 'svelte';
 
 	export let data;
@@ -9,7 +10,7 @@
 	// ****************** grid and color
 	const GRID_SIZE = 50;
 	const BLANK_COLOR = '#ffffff';
-	let currentColor = '#ff0000';
+	let currentColor = DEFAULT_COLOR;
 	const emplacementColors: Array<string> = new Array(GRID_SIZE * GRID_SIZE).fill(BLANK_COLOR);
 	for (const emplacementCase of data.cases) {
 		emplacementColors[emplacementCase.x * GRID_SIZE + emplacementCase.y] = emplacementCase.color;
@@ -61,9 +62,16 @@
 		}
 	}
 
+	function handleCurrentColor(event: Event) {
+		const newColor = (event.target as HTMLInputElement).value;
+		setCookieColor(newColor);
+	}
+
 	onMount(() => {
 		if (browser) {
 			window.addEventListener('keydown', handleKeyDown);
+
+			currentColor = getCookieColor();
 
 			const unsubscribe = subscribe(
 				/* GraphQL */ `
@@ -95,7 +103,13 @@
 
 	<div class="color-container">
 		<p>Select your</p>
-		<input type="color" id="head" name="head" bind:value={currentColor} />
+		<input
+			type="color"
+			id="head"
+			name="head"
+			bind:value={currentColor}
+			on:change={handleCurrentColor}
+		/>
 		<p>and <span class="paint-line-through">paint</span> fight!</p>
 	</div>
 
