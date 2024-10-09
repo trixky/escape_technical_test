@@ -4,9 +4,18 @@
 
 	export let data;
 
-	let color = '#ff0000';
-
 	const GRID_SIZE = 10;
+	const BLANK_COLOR = '#ffffff';
+
+	interface Emplacement {
+		id: number;
+		x: number;
+		y: number;
+		color: string;
+	}
+
+	let color = '#ff0000';
+	const emplacementColors: Array<string> = new Array(GRID_SIZE * GRID_SIZE).fill(BLANK_COLOR);
 
 	$: displayed = JSON.stringify(data, null, 2);
 
@@ -14,8 +23,8 @@
 		console.log('clicked', i, j);
 
 		try {
-			const emplacements = await createOrUpdateEmplacement(i, j, color);
-			console.log('Emplacements:', emplacements);
+			const emplacements = (await createOrUpdateEmplacement(i, j, color)) as Emplacement;
+			emplacementColors[i * GRID_SIZE + j] = emplacements.color;
 		} catch (error: any) {
 			alert('Erreur lors de la récupération des emplacements:');
 			console.error(error);
@@ -43,10 +52,12 @@
 
 	<div class="grid">
 		{#each Array.from({ length: GRID_SIZE }, (_, i) => i) as i}
+			{@const emplacementColorLine = i * GRID_SIZE}
 			<div class="row">
 				{#each Array.from({ length: GRID_SIZE }, (_, j) => j) as j}
+					{@const emplacementColor = emplacementColors[emplacementColorLine + j]}
 					<button on:click={() => handleClick(i, j)}>
-						<div class="cell"></div>
+						<div class="cell" style={`background-color: ${emplacementColor};`}></div>
 					</button>
 				{/each}
 			</div>
@@ -81,7 +92,6 @@
 	.cell {
 		width: 20px;
 		height: 20px;
-		background-color: #f0f0f0;
 		border: 1px solid #ccc;
 	}
 </style>
