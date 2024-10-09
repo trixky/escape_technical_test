@@ -75,13 +75,12 @@
 </script>
 
 <div class="global-container">
-	<h1>r/ploce</h1>
-
-	<p>Received from the server: {data.cases.length}</p>
+	<h1>r/place</h1>
 
 	<div class="color-container">
-		<p>select a color:</p>
+		<p>Select your</p>
 		<input type="color" id="head" name="head" bind:value={color} />
+		<p>and fight!</p>
 	</div>
 
 	<div class="grid">
@@ -111,6 +110,7 @@
 	}
 
 	.color-container {
+		padding: 20px 0;
 		display: flex;
 		align-items: center;
 		gap: 10px;
