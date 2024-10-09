@@ -5,21 +5,57 @@
 
 	export let data;
 
+	// ****************** grid and color
 	const GRID_SIZE = 50;
 	const BLANK_COLOR = '#ffffff';
-
 	let color = '#ff0000';
 	const emplacementColors: Array<string> = new Array(GRID_SIZE * GRID_SIZE).fill(BLANK_COLOR);
 	for (const emplacementCase of data.cases) {
 		emplacementColors[emplacementCase.x * GRID_SIZE + emplacementCase.y] = emplacementCase.color;
 	}
+	// ****************** keyboard control
+	let KeyboardFocus = false;
+	let xKeyboardFocus = 0;
+	let yKeyboardFocus = 0;
 
-	async function handleClick(i: number, j: number) {
+	function handleKeyDown(event: KeyboardEvent) {
+		let newKeyboardFocus = true;
+		switch (event.key) {
+			case 'ArrowUp':
+				xKeyboardFocus = Math.max(0, xKeyboardFocus - 1);
+				break;
+			case 'ArrowDown':
+				xKeyboardFocus = Math.min(GRID_SIZE - 1, xKeyboardFocus + 1);
+				break;
+			case 'ArrowLeft':
+				yKeyboardFocus = Math.max(0, yKeyboardFocus - 1);
+				break;
+			case 'ArrowRight':
+				yKeyboardFocus = Math.min(GRID_SIZE - 1, yKeyboardFocus + 1);
+				break;
+			case 'Enter':
+			case ' ':
+				event.preventDefault();
+				handlePaint(xKeyboardFocus, yKeyboardFocus);
+				break;
+			default:
+				newKeyboardFocus = false;
+		}
+		if (newKeyboardFocus) KeyboardFocus = true;
+	}
+
+	window.addEventListener('keydown', handleKeyDown);
+
+	async function handlePaint(i: number, j: number) {
 		console.log('clicked', i, j);
 
 		try {
-			const emplacements = (await createOrUpdateEmplacement(i, j, color)) as Emplacement;
-			emplacementColors[i * GRID_SIZE + j] = emplacements.color;
+			const paintEmplacement = (await createOrUpdateEmplacement(i, j, color)) as Emplacement;
+			emplacementColors[paintEmplacement.x * GRID_SIZE + paintEmplacement.y] =
+				paintEmplacement.color;
+			KeyboardFocus = true;
+			xKeyboardFocus = paintEmplacement.x;
+			yKeyboardFocus = paintEmplacement.y;
 		} catch (error: any) {
 			alert('Erreur lors de la récupération des emplacements:');
 			console.error(error);
@@ -31,7 +67,10 @@
 			console.log('Received from the server:', data);
 		});
 
-		return unsubscribe;
+		return () => {
+			unsubscribe();
+			window.removeEventListener('keydown', handleKeyDown);
+		};
 	});
 </script>
 
@@ -51,12 +90,14 @@
 			<div class="row">
 				{#each Array.from({ length: GRID_SIZE }, (_, j) => j) as j}
 					{@const emplacementColor = emplacementColors[emplacementColorLine + j]}
-					<button on:click={() => handleClick(i, j)}>
-						<div class="cell" style={`background-color: ${emplacementColor};`}></div>
+					{@const focused = KeyboardFocus && i === xKeyboardFocus && j === yKeyboardFocus}
+					<button tabindex="-1" on:click={() => handlePaint(i, j)}>
+						<div class="cell" class:focused style={`background-color: ${emplacementColor};`}></div>
 					</button>
 				{/each}
 			</div>
 		{/each}
+		<p class="keyboard-tips">You can pain with the arrow keys and the space bar</p>
 	</div>
 </div>
 
@@ -89,5 +130,16 @@
 		height: 10px;
 		border: 1px solid #ccc;
 		transition: background-color 200ms;
+	}
+
+	.cell.focused {
+		border: 1px solid #000;
+	}
+
+	p.keyboard-tips {
+		margin-left: auto;
+		font-size: 0.8em;
+		opacity: 0.5;
+		font-style: italic;
 	}
 </style>
