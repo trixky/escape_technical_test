@@ -99,8 +99,6 @@
 </script>
 
 <div class="global-container">
-	<h1 data-aos="fade-down" data-aos-delay="100">r/place</h1>
-
 	<div data-aos="fade-down" class="color-container">
 		<p>Select your</p>
 		<input
