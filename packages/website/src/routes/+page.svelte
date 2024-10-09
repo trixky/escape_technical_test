@@ -88,5 +88,6 @@
 		width: 10px;
 		height: 10px;
 		border: 1px solid #ccc;
+		transition: background-color 200ms;
 	}
 </style>
