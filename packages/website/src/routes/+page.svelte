@@ -99,9 +99,9 @@
 </script>
 
 <div class="global-container">
-	<h1>r/place</h1>
+	<h1 data-aos="fade-down" data-aos-delay="100">r/place</h1>
 
-	<div class="color-container">
+	<div data-aos="fade-down" class="color-container">
 		<p>Select your</p>
 		<input
 			type="color"
@@ -126,7 +126,9 @@
 				{/each}
 			</div>
 		{/each}
-		<p class="keyboard-tips">You can pain with the arrow keys and the space bar</p>
+		<p data-aos="fade-left" class="keyboard-tips">
+			You can pain with the arrow keys and the space bar
+		</p>
 	</div>
 </div>
 
