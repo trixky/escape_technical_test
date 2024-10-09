@@ -8,6 +8,7 @@
 - rate limit more than 1 by period
 - big board with x/y scroll and mouse navigation
 - notification toast (success/ratelimit/etc..)
+- css/tailwind global variable for more coherent style/spacing
 
 ====== DONE
 

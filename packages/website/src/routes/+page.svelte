@@ -129,12 +129,12 @@
 				{/each}
 			</div>
 		{/each}
-		<p data-aos="fade-left" class="keyboard-tips">
-			You can pain with the arrow keys and the space bar
-		</p>
-		<p data-aos="fade-left" data-aos-delay="50" class="keyboard-tips">
-			Rate limit: 1 paint every 5 seconds
-		</p>
+		<div class="tips-container">
+			<p data-aos="fade-left" class="tips">You can pain with the arrow keys and the space bar</p>
+			<p data-aos="fade-left" data-aos-delay="50" class="tips">
+				Rate limit: 1 paint every 5 seconds
+			</p>
+		</div>
 	</div>
 </div>
 
@@ -174,10 +174,15 @@
 		border: 1px solid #000;
 	}
 
-	p.keyboard-tips {
-		margin-left: auto;
+	.tips-container {
+		padding-top: 3px;
+		opacity: 0.3;
+		width: 100%;
+		text-align: right;
+	}
+
+	p.tips {
 		font-size: 0.8em;
-		opacity: 0.5;
 		font-style: italic;
 	}
 

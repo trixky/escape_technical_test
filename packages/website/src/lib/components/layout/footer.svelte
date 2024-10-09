@@ -5,17 +5,19 @@
 	import LogoInstagram from 'virtual:icons/mdi/instagram';
 
 	const LOGO_WIDTH = 30;
+	const AOS_OFFSET = -1000;
 </script>
 
 <!-- ****************************************************** CONTENT -->
 <footer>
-	<h3 data-aos="fade-up">Follow us</h3>
+	<h3 data-aos="fade-up" data-aos-offset={AOS_OFFSET}>Follow us</h3>
 	<ul class="logo-container">
 		<li>
 			<a href="https://www.reddit.com/" target="_blank">
 				<LogoReddit
 					data-aos="fade-up"
 					data-aos-delay="50"
+					data-aos-offset={AOS_OFFSET}
 					width={LOGO_WIDTH}
 					height={LOGO_WIDTH}
 					color="black"
@@ -27,6 +29,7 @@
 				<LogoTwitter
 					data-aos="fade-up"
 					data-aos-delay="100"
+					data-aos-offset={AOS_OFFSET}
 					width={LOGO_WIDTH}
 					height={LOGO_WIDTH}
 					color="black"
@@ -38,6 +41,7 @@
 				<LogoInstagram
 					data-aos="fade-up"
 					data-aos-delay="150"
+					data-aos-offset={AOS_OFFSET}
 					width={LOGO_WIDTH}
 					height={LOGO_WIDTH}
 					color="black"
