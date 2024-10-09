@@ -52,7 +52,12 @@
 
 	async function handlePaint(i: number, j: number) {
 		try {
-			await createOrUpdateEmplacement(i, j, currentColor);
+			const res: Emplacement = await createOrUpdateEmplacement(i, j, currentColor);
+			const RATE_LIMIT_VALUE = -1;
+			if (res.x === RATE_LIMIT_VALUE || res.y === RATE_LIMIT_VALUE) {
+				alert('rate limit reached');
+				return;
+			}
 			KeyboardFocus = true;
 			xKeyboardFocus = i;
 			yKeyboardFocus = j;
@@ -126,6 +131,9 @@
 		{/each}
 		<p data-aos="fade-left" class="keyboard-tips">
 			You can pain with the arrow keys and the space bar
+		</p>
+		<p data-aos="fade-left" data-aos-delay="50" class="keyboard-tips">
+			Rate limit: 1 paint every 5 seconds
 		</p>
 	</div>
 </div>

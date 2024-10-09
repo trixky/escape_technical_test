@@ -1,13 +1,16 @@
 ================ BONUS
 
-- tailwind
-- rate limit
-- cache
 - pattern
+- tailwind
+- cache for help the db
 - global theme style
 - readme to explain how to up
-- aos
+- rate limit more than 1 by period
+- big board with x/y scroll and mouse navigation
+- notification toast (success/ratelimit/etc..)
 
 ====== DONE
 
 - color persistant > cookie
+- rate limit
+- aos
