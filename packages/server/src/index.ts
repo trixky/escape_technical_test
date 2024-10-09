@@ -1,9 +1,16 @@
 import { createServer } from 'node:http';
 import { createSchema, createYoga } from 'graphql-yoga';
 import { createPubSub } from 'graphql-yoga';
-import { PrismaClient } from '@prisma/client';
+import { createClient } from 'redis';
+import prismaClient from './database/client.js'
+import { emplacementCreateOrUpdate, emplacementGetAll } from './database/emplacement.js';
 
-const prisma = new PrismaClient();
+// ------------------- redis
+const redisClient = createClient();
+redisClient.on('error', err => console.log('Redis Client Error', err));
+await redisClient.connect();
+
+
 
 export const pubsub = createPubSub<{
     emplacementUpdated: [{ x: number, y: number, color: string }];
@@ -42,27 +49,15 @@ const yoga = createYoga({
         resolvers: {
             Query: {
                 hello: () => 'world',
-                emplacements: () => prisma.emplacement.findMany(),
+                emplacements: () => prismaClient.emplacement.findMany(),
                 cases: async () => {
-                    const emplacements = await prisma.emplacement.findMany();
+                    const emplacements = await emplacementGetAll();
                     return emplacements.map(({ id, ...rest }) => rest);
                 },
             },
             Mutation: {
                 createOrUpdateEmplacement: async (_, { x, y, color }) => {
-                    const emplacement = await prisma.emplacement.upsert({
-                        where: {
-                            x_y: { x, y }
-                        },
-                        update: {
-                            color
-                        },
-                        create: {
-                            x,
-                            y,
-                            color
-                        },
-                    });
+                    const emplacement = await emplacementCreateOrUpdate(x, y, color);
 
                     pubsub.publish('emplacementUpdated', {
                         x: emplacement.x,
