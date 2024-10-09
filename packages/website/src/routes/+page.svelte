@@ -9,7 +9,7 @@
 	// ****************** grid and color
 	const GRID_SIZE = 50;
 	const BLANK_COLOR = '#ffffff';
-	let color = '#ff0000';
+	let currentColor = '#ff0000';
 	const emplacementColors: Array<string> = new Array(GRID_SIZE * GRID_SIZE).fill(BLANK_COLOR);
 	for (const emplacementCase of data.cases) {
 		emplacementColors[emplacementCase.x * GRID_SIZE + emplacementCase.y] = emplacementCase.color;
@@ -45,16 +45,16 @@
 		if (newKeyboardFocus) KeyboardFocus = true;
 	}
 
-	async function handlePaint(i: number, j: number) {
-		console.log('clicked', i, j);
+	function handleUpdatedColor(i: number, j: number, color: string) {
+		emplacementColors[i * GRID_SIZE + j] = color;
+	}
 
+	async function handlePaint(i: number, j: number) {
 		try {
-			const paintEmplacement = (await createOrUpdateEmplacement(i, j, color)) as Emplacement;
-			emplacementColors[paintEmplacement.x * GRID_SIZE + paintEmplacement.y] =
-				paintEmplacement.color;
+			await createOrUpdateEmplacement(i, j, currentColor);
 			KeyboardFocus = true;
-			xKeyboardFocus = paintEmplacement.x;
-			yKeyboardFocus = paintEmplacement.y;
+			xKeyboardFocus = i;
+			yKeyboardFocus = j;
 		} catch (error: any) {
 			alert('Erreur lors de la récupération des emplacements:');
 			console.error(error);
@@ -65,9 +65,22 @@
 		if (browser) {
 			window.addEventListener('keydown', handleKeyDown);
 
-			const unsubscribe = subscribe(/* GraphQL */ 'subscription { hello }', (data) => {
-				console.log('Received from the server:', data);
-			});
+			const unsubscribe = subscribe(
+				/* GraphQL */ `
+					subscription {
+						emplacementUpdated {
+							x
+							y
+							color
+						}
+					}
+				`,
+				(data: any) => {
+					const parsedData = JSON.parse(data);
+					const emplacement = parsedData.data.emplacementUpdated as Emplacement;
+					handleUpdatedColor(emplacement.x, emplacement.y, emplacement.color);
+				}
+			);
 
 			return () => {
 				unsubscribe();
@@ -82,7 +95,7 @@
 
 	<div class="color-container">
 		<p>Select your</p>
-		<input type="color" id="head" name="head" bind:value={color} />
+		<input type="color" id="head" name="head" bind:value={currentColor} />
 		<p>and fight!</p>
 	</div>
 

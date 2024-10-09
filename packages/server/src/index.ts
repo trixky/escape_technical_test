@@ -4,40 +4,41 @@ import { createPubSub } from 'graphql-yoga';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
+
 export const pubsub = createPubSub<{
-    hello: [string];
+    emplacementUpdated: [{ x: number, y: number, color: string }];
 }>();
 
 const yoga = createYoga({
     schema: createSchema({
         typeDefs: /* GraphQL */ `
-      type Query {
-        hello: String
-        emplacements: [Emplacement]
-        cases: [Case]
-      }
+            type Query {
+                hello: String
+                emplacements: [Emplacement]
+                cases: [Case]
+            }
 
-      type Mutation {
-        createOrUpdateEmplacement(x: Float!, y: Float!, color: String!): Emplacement
-        }
+            type Mutation {
+                createOrUpdateEmplacement(x: Float!, y: Float!, color: String!): Emplacement
+            }
 
-      type Subscription {
-        hello: String
-      }
+            type Subscription {
+                emplacementUpdated: Emplacement
+            }
 
-      type Emplacement {
-        id: Int
-        x: Float
-        y: Float
-        color: String
-      }
+            type Emplacement {
+                id: Int
+                x: Float
+                y: Float
+                color: String
+            }
 
-      type Case {
-        x: Float
-        y: Float
-        color: String
-      }
-    `,
+            type Case {
+                x: Float
+                y: Float
+                color: String
+            }
+        `,
         resolvers: {
             Query: {
                 hello: () => 'world',
@@ -49,7 +50,7 @@ const yoga = createYoga({
             },
             Mutation: {
                 createOrUpdateEmplacement: async (_, { x, y, color }) => {
-                    return await prisma.emplacement.upsert({
+                    const emplacement = await prisma.emplacement.upsert({
                         where: {
                             x_y: { x, y }
                         },
@@ -62,23 +63,27 @@ const yoga = createYoga({
                             color
                         },
                     });
+
+                    pubsub.publish('emplacementUpdated', {
+                        x: emplacement.x,
+                        y: emplacement.y,
+                        color: emplacement.color
+                    });
+
+                    return emplacement;
                 },
             },
             Subscription: {
-                hello: {
-                    subscribe: () => pubsub.subscribe('hello'),
-                    resolve: (payload) => payload,
+                emplacementUpdated: {
+                    subscribe: () => pubsub.subscribe('emplacementUpdated'),
+                    resolve: (payload) => {
+                        return payload;
+                    },
                 },
             },
         },
     }),
 });
-
-let i = 0;
-setInterval(() => {
-    i++;
-    pubsub.publish('hello', `world ${i}`);
-}, 5000);
 
 const server = createServer(yoga);
 server.listen(4000, () => {
