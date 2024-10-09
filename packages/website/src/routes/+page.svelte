@@ -5,7 +5,7 @@
 
 	export let data;
 
-	const GRID_SIZE = 10;
+	const GRID_SIZE = 50;
 	const BLANK_COLOR = '#ffffff';
 
 	let color = '#ff0000';
@@ -85,8 +85,8 @@
 	}
 
 	.cell {
-		width: 20px;
-		height: 20px;
+		width: 10px;
+		height: 10px;
 		border: 1px solid #ccc;
 	}
 </style>
