@@ -1,0 +1,88 @@
+services:
+  # website:
+  #   build: ./packages/website
+  #   volumes:
+  #     - ./packages/website:/app
+  #   depends_on:
+  #     - server
+  #   links:
+  #     - server
+  #   ports:
+  #     - '5173:5173' # TODO: put the port in the .env.sh file
+  #   restart: unless-stopped
+
+  # server:
+  #   build: ./packages/server
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_HOST: ${POSTGRES_HOST}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #     POSTGRES_PORT: ${POSTGRES_PORT}
+  #   volumes:
+  #     - ./packages/server:/go/src/go-with-compose
+  #   command: go run main.go
+  #   depends_on:
+  #     - postgres
+  #     - redis
+  #   links:
+  #     - postgres
+  #     - redis
+  #   ports:
+  #     - '4000:4000' # TODO: put the port in the .env.sh file
+
+  # access to the server:
+  # $> docker-compose exec server sh
+
+  # go test (only logic part):
+  # $> docker-compose exec server gp test ./logic
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - redis-data:/data
+
+    # access to the redis CLI:
+    # $> docker-compose exec redis sh -c 'redis-cli -h redis'
+
+  postgres:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGUSER: ${PGUSER} # psql
+      PGPASSWORD: ${PGPASSWORD} # psql
+      PGDATABASE: ${PGDATABASE} # psql
+    ports:
+      - '5432:5432' # TODO: put the port in the .env.sh file
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./packages/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+    # access to the psql CLI:
+    # $> docker-compose exec postgres psql
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres
+    ports:
+      - '5050:80' # TODO: put the port in the .env.sh file
+    restart: unless-stopped
+    links:
+      - postgres
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  postgres-data:
+    driver: local
+  pgadmin-data:
+    driver: local
+  redis-data:
+    driver: local
