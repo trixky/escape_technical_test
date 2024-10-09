@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createOrUpdateEmplacement, subscribe } from '$lib/graphql';
+	import type Emplacement from '$lib/models/emplacement.js';
 	import { onMount } from 'svelte';
 
 	export let data;
@@ -7,17 +8,11 @@
 	const GRID_SIZE = 10;
 	const BLANK_COLOR = '#ffffff';
 
-	interface Emplacement {
-		id: number;
-		x: number;
-		y: number;
-		color: string;
-	}
-
 	let color = '#ff0000';
 	const emplacementColors: Array<string> = new Array(GRID_SIZE * GRID_SIZE).fill(BLANK_COLOR);
-
-	$: displayed = JSON.stringify(data, null, 2);
+	for (const emplacementCase of data.cases) {
+		emplacementColors[emplacementCase.x * GRID_SIZE + emplacementCase.y] = emplacementCase.color;
+	}
 
 	async function handleClick(i: number, j: number) {
 		console.log('clicked', i, j);
@@ -43,7 +38,7 @@
 <div class="global-container">
 	<h1>r/ploce</h1>
 
-	<p>Received from the server: {displayed}</p>
+	<p>Received from the server: {data.cases.length}</p>
 
 	<div class="color-container">
 		<p>select a color:</p>

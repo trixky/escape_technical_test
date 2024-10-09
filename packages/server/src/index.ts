@@ -14,6 +14,7 @@ const yoga = createYoga({
       type Query {
         hello: String
         emplacements: [Emplacement]
+        cases: [Case]
       }
 
       type Mutation {
@@ -30,11 +31,21 @@ const yoga = createYoga({
         y: Float
         color: String
       }
+
+      type Case {
+        x: Float
+        y: Float
+        color: String
+      }
     `,
         resolvers: {
             Query: {
                 hello: () => 'world',
                 emplacements: () => prisma.emplacement.findMany(),
+                cases: async () => {
+                    const emplacements = await prisma.emplacement.findMany();
+                    return emplacements.map(({ id, ...rest }) => rest);
+                },
             },
             Mutation: {
                 createOrUpdateEmplacement: async (_, { x, y, color }) => {

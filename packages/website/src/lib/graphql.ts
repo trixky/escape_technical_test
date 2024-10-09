@@ -11,19 +11,18 @@ export const gql = async (query: string, variables?: Record<string, unknown>) =>
 	}).then((res) => res.json());
 };
 
-export const getEmplacements = async () => {
+export const getCases = async () => {
 	const query = `
-		query {
-			emplacements {
-				id
-				x
-				y
-				color
-			}
-		}
-	`;
+        query {
+            cases {
+                x
+                y
+                color
+            }
+        }
+    `;
 	const response = await gql(query);
-	return response.data?.emplacements || [];
+	return response.data?.cases || [];
 };
 
 export const createOrUpdateEmplacement = async (x: number, y: number, color: string) => {

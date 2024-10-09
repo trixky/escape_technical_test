@@ -1,4 +1,5 @@
-import { gql } from '$lib/graphql';
+import { getCases, gql } from '$lib/graphql';
+import type Emplacement from '$lib/models/emplacement';
 import { z } from 'zod';
 
 const model = z.object({
@@ -8,9 +9,14 @@ const model = z.object({
 });
 
 export const load = async () => {
-	return gql(/* GraphQL */ `
-		query {
-			hello
-		}
-	`).then((res) => model.parse(res).data);
+	const cases = await getCases() as Array<Emplacement>;
+
+	return { cases };
+
+	// return gql(/* GraphQL */ `
+	// 	query {
+	// 		hello
+	// 	}
+	// `).then((res) => model.parse(res).data);
+
 };
