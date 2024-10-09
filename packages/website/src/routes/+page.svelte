@@ -96,7 +96,7 @@
 	<div class="color-container">
 		<p>Select your</p>
 		<input type="color" id="head" name="head" bind:value={currentColor} />
-		<p>and fight!</p>
+		<p>and <span class="paint-line-through">paint</span> fight!</p>
 	</div>
 
 	<div class="grid">
@@ -157,5 +157,9 @@
 		font-size: 0.8em;
 		opacity: 0.5;
 		font-style: italic;
+	}
+
+	.paint-line-through {
+		text-decoration: line-through;
 	}
 </style>
