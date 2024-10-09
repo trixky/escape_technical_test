@@ -11,6 +11,37 @@ export const gql = async (query: string, variables?: Record<string, unknown>) =>
 	}).then((res) => res.json());
 };
 
+export const getEmplacements = async () => {
+	const query = `
+		query {
+			emplacements {
+				id
+				x
+				y
+				color
+			}
+		}
+	`;
+	const response = await gql(query);
+	return response.data?.emplacements || [];
+};
+
+export const createOrUpdateEmplacement = async (x: number, y: number, color: string) => {
+	const mutation = `
+        mutation ($x: Float!, $y: Float!, $color: String!) {
+            createOrUpdateEmplacement(x: $x, y: $y, color: $color) {
+                id
+                x
+                y
+                color
+            }
+        }
+    `;
+	const variables = { x, y, color };
+	const response = await gql(mutation, variables);
+	return response.data?.createOrUpdateEmplacement || null;
+};
+
 export const subscribe = <T = unknown>(query: string, onData: (d: T) => void) => {
 	const subscriptionURL = new URL(env.PUBLIC_API_ENDPOINT);
 	subscriptionURL.searchParams.append('query', query);
