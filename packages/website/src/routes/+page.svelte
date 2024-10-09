@@ -1,18 +1,19 @@
-<script>
+<script lang="ts">
 	import { subscribe } from '$lib/graphql';
 	import { onMount } from 'svelte';
 
 	export let data;
+	const GRID_SIZE = 10;
 
 	$: displayed = JSON.stringify(data, null, 2);
 
-	onMount(() =>
-		subscribe(/* GraphQL */ 'subscription { hello }', (data) => {
+	onMount(() => {
+		const unsubscribe = subscribe(/* GraphQL */ 'subscription { hello }', (data) => {
 			console.log('Received from the server:', data);
-		})
-	);
+		});
 
-	let size = 10;
+		return unsubscribe;
+	});
 </script>
 
 <h1>r/ploce</h1>
@@ -20,9 +21,9 @@
 <p>Received from the server: {displayed}</p>
 
 <div class="grid">
-	{#each Array.from({ length: size }, (_, i) => i) as i}
+	{#each Array.from({ length: GRID_SIZE }, (_, i) => i) as i}
 		<div class="row">
-			{#each Array.from({ length: size }, (_, j) => j) as j}
+			{#each Array.from({ length: GRID_SIZE }, (_, j) => j) as j}
 				<div class="cell"></div>
 			{/each}
 		</div>
