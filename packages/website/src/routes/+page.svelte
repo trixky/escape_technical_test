@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { createOrUpdateEmplacement, subscribe } from '$lib/graphql';
 	import type Emplacement from '$lib/models/emplacement.js';
 	import { onMount } from 'svelte';
@@ -44,8 +45,6 @@
 		if (newKeyboardFocus) KeyboardFocus = true;
 	}
 
-	window.addEventListener('keydown', handleKeyDown);
-
 	async function handlePaint(i: number, j: number) {
 		console.log('clicked', i, j);
 
@@ -63,14 +62,18 @@
 	}
 
 	onMount(() => {
-		const unsubscribe = subscribe(/* GraphQL */ 'subscription { hello }', (data) => {
-			console.log('Received from the server:', data);
-		});
+		if (browser) {
+			window.addEventListener('keydown', handleKeyDown);
 
-		return () => {
-			unsubscribe();
-			window.removeEventListener('keydown', handleKeyDown);
-		};
+			const unsubscribe = subscribe(/* GraphQL */ 'subscription { hello }', (data) => {
+				console.log('Received from the server:', data);
+			});
+
+			return () => {
+				unsubscribe();
+				window.removeEventListener('keydown', handleKeyDown);
+			};
+		}
 	});
 </script>
 
