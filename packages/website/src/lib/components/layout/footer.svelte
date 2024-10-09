@@ -70,7 +70,7 @@
 	}
 
 	li {
-		opacity: 0.3;
+		opacity: 0.2;
 		transition: opacity 200ms;
 	}
 
